@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-public class LiftBehaviour : MonoBehaviour {
-
+public class LiftBehaviour : MonoBehaviour
+{
     public int speed = 1;
     public float floorHigh = 5;
     public float high;
@@ -19,7 +20,7 @@ public class LiftBehaviour : MonoBehaviour {
         minY = high;
     }
 
-    public void Lifting(CharacterController presser,int newDirection)
+    public void Lifting(CharacterController presser, int newDirection)
     {
         if (direction != 0)
         {
@@ -34,44 +35,27 @@ public class LiftBehaviour : MonoBehaviour {
             return;
         }
         buttonPresser = presser;
+        StartCoroutine(ContinueLifting());
     }
 
-    public void Update()
+    private IEnumerator ContinueLifting()
     {
-        if (direction != 0)
+        while (
+            (direction < 0 && destination < high)
+            || (direction > 0 && destination > high)
+        )
         {
-            if ( direction > 0 && destination < high)
+            var pos = transform.position;
+            transform.position = new Vector3(pos.x, pos.y + speed * Time.deltaTime * direction, pos.z);
+            if (buttonPresser != null)
             {
-                StopLifting();
+                buttonPresser.Move(new Vector3(0, speed * Time.deltaTime * direction, 0));
             }
-            else if (direction < 0 && destination > high)
-            {
-                StopLifting();
-            }
-            else
-            {
-                ContinueLifting();
-            }
+            high = pos.y;
+            yield return null;
         }
-            
-    }
-
-    private void StopLifting()
-    {
         direction = 0;
         buttonPresser = null;
-    }
-
-    private void ContinueLifting()
-    {
-        
-        var pos = transform.position;
-        transform.position = new Vector3(pos.x, pos.y + speed * Time.deltaTime * direction, pos.z);
-        if (buttonPresser != null)
-        {
-            buttonPresser.Move(new Vector3(0, speed * Time.deltaTime * direction, 0));
-        }
-        high = pos.y;
     }
 
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : MonoBehaviour {
 
@@ -11,10 +9,14 @@ public class Player : MonoBehaviour {
 
     private float yVelocity = 0f;
     private CharacterController cc;
+    private InteractableWithRaycast interacter;
+
 	// Use this for initialization
 	void Start () {
+        Cursor.lockState = CursorLockMode.Locked;
         cc = GetComponent<CharacterController>();
-	}
+        interacter = GetComponentInChildren<InteractableWithRaycast>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -38,15 +40,23 @@ public class Player : MonoBehaviour {
             }
             cc.Move(velocity);
         }
-        
+        if (Input.GetKey(KeyCode.E) && interacter.CurrentTarget != null)
+        {
+            pressLiftUp(interacter.CurrentTarget);
+        }
 	}
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        var button = hit.gameObject.GetComponent<LiftButton>();
+        pressLiftUp(hit.gameObject);
+    }
+
+    private void pressLiftUp(GameObject btnContainer)
+    {
+        var button = btnContainer.GetComponent<LiftButton>();
         if (button != null)
         {
-            button.LiftUp(cc);
+            button.Press(cc);
         }
     }
 }

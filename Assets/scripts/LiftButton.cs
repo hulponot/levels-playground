@@ -17,28 +17,29 @@ public class LiftButton : MonoBehaviour {
         originXPosition = transform.position.x;
     }
 
-    public void LiftUp(CharacterController player)
+    public void Press(CharacterController player)
     {
         if (!pressed)
         {
-            lift.Lifting(player, direction);
-            ButtonPressed();
+            pressed = true;
+            ButtonPull();
+            Action(player);
+            StartCoroutine(ButtonPressAnimation());
         }
     }
 
-    private void ButtonPressed()
+    private void Action(CharacterController player)
     {
-        pressed = true;
-        var pos = transform.position;
-        transform.position = new Vector3(pos.x + pressOffset, pos.y, pos.z);
-        StartCoroutine(ButtonReturn());
-    }
-    private void ButtonReleased()
-    {
-        pressed = false;
+        lift.Lifting(player, direction);
     }
 
-    private IEnumerator ButtonReturn()
+    private void ButtonPull()
+    {
+        var pos = transform.position;
+        transform.position = new Vector3(pos.x + pressOffset, pos.y, pos.z);
+    }
+
+    private IEnumerator ButtonPressAnimation()
     {
         for (var offseted = transform.position.x;
             originXPosition - offseted > 0; 
